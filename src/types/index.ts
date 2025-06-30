@@ -8,9 +8,10 @@ export interface User {
 
 export interface Unit {
   id: string;
-  number: string;
-  building: string;
-  floor: number;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
   bedrooms: number;
   bathrooms: number;
   rent: number;

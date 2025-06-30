@@ -90,15 +90,15 @@ export default function MyUnitPage() {
     <Layout user={user}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#e5e7eb]">My Unit</h1>
-          <p className="text-gray-400">Unit {userUnit.number} • {userUnit.building}</p>
+          <h1 className="text-2xl font-bold text-[#e5e7eb]">My Property</h1>
+          <p className="text-gray-400">{userUnit.address} • {userUnit.city}, {userUnit.state}</p>
         </div>
 
         {/* Unit Overview */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-blue-400">Unit Overview</h3>
+              <h3 className="text-lg font-medium text-blue-400">Property Overview</h3>
               <Badge variant={userUnit.status === 'occupied' ? 'success' : 'warning'}>
                 {userUnit.status}
               </Badge>
@@ -110,45 +110,29 @@ export default function MyUnitPage() {
                 <div className="flex items-center">
                   <Home className="h-5 w-5 text-blue-400 mr-3" />
                   <div>
-                    <dt className="text-sm font-medium text-gray-400">Unit Number</dt>
-                    <dd className="text-sm text-[#e5e7eb]">{userUnit.number}</dd>
+                    <dt className="text-sm font-medium text-gray-400">Address</dt>
+                    <dd className="text-sm text-[#e5e7eb]">{userUnit.address}</dd>
                   </div>
                 </div>
                 
                 <div className="flex items-center">
                   <MapPin className="h-5 w-5 text-blue-400 mr-3" />
                   <div>
-                    <dt className="text-sm font-medium text-gray-400">Building</dt>
-                    <dd className="text-sm text-[#e5e7eb]">{userUnit.building}</dd>
+                    <dt className="text-sm font-medium text-gray-400">Location</dt>
+                    <dd className="text-sm text-[#e5e7eb]">{userUnit.city}, {userUnit.state} {userUnit.zipCode}</dd>
                   </div>
                 </div>
                 
                 <div className="flex items-center">
                   <Home className="h-5 w-5 text-blue-400 mr-3" />
                   <div>
-                    <dt className="text-sm font-medium text-gray-400">Floor</dt>
-                    <dd className="text-sm text-[#e5e7eb]">{userUnit.floor}</dd>
+                    <dt className="text-sm font-medium text-gray-400">Property Type</dt>
+                    <dd className="text-sm text-[#e5e7eb]">{userUnit.bedrooms}BR / {userUnit.bathrooms}BA</dd>
                   </div>
                 </div>
               </div>
               
               <div className="space-y-4">
-                <div className="flex items-center">
-                  <Home className="h-5 w-5 text-blue-400 mr-3" />
-                  <div>
-                    <dt className="text-sm font-medium text-gray-400">Bedrooms</dt>
-                    <dd className="text-sm text-[#e5e7eb]">{userUnit.bedrooms}</dd>
-                  </div>
-                </div>
-                
-                <div className="flex items-center">
-                  <Home className="h-5 w-5 text-blue-400 mr-3" />
-                  <div>
-                    <dt className="text-sm font-medium text-gray-400">Bathrooms</dt>
-                    <dd className="text-sm text-[#e5e7eb]">{userUnit.bathrooms}</dd>
-                  </div>
-                </div>
-                
                 <div className="flex items-center">
                   <Home className="h-5 w-5 text-blue-400 mr-3" />
                   <div>

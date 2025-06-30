@@ -88,7 +88,8 @@ export default function AdminResidents() {
   const filteredResidents = residents.filter(resident => {
     const matchesSearch = resident.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          resident.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resident.unit?.number.toLowerCase().includes(searchTerm.toLowerCase());
+                         resident.unit?.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         resident.unit?.city.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesFilter = filterStatus === 'all' || 
                          (filterStatus === 'with-bills' && resident.overdueBills > 0) ||
@@ -195,7 +196,7 @@ export default function AdminResidents() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search residents by name, email, or unit..."
+                    placeholder="Search residents by name, email, or address..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-[#22304a] border border-[#22304a] rounded-lg text-[#e5e7eb] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
@@ -238,7 +239,7 @@ export default function AdminResidents() {
                         {resident.unit && (
                           <div className="flex items-center space-x-1">
                             <Building2 className="h-4 w-4" />
-                            <span>Unit {resident.unit.number}</span>
+                            <span>{resident.unit.address}</span>
                             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(resident.unit.status)}`}>
                               {resident.unit.status}
                             </span>
@@ -289,16 +290,16 @@ export default function AdminResidents() {
                   <div className="mt-4 pt-4 border-t border-[#22304a]">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-400">Building:</span>
-                        <span className="ml-2 text-[#e5e7eb]">{resident.unit.building}</span>
+                        <span className="text-gray-400">Address:</span>
+                        <span className="ml-2 text-[#e5e7eb]">{resident.unit.address}</span>
                       </div>
                       <div>
-                        <span className="text-gray-400">Floor:</span>
-                        <span className="ml-2 text-[#e5e7eb]">{resident.unit.floor}</span>
+                        <span className="text-gray-400">Location:</span>
+                        <span className="ml-2 text-[#e5e7eb]">{resident.unit.city}, {resident.unit.state}</span>
                       </div>
                       <div>
-                        <span className="text-gray-400">Bedrooms:</span>
-                        <span className="ml-2 text-[#e5e7eb]">{resident.unit.bedrooms}</span>
+                        <span className="text-gray-400">Type:</span>
+                        <span className="ml-2 text-[#e5e7eb]">{resident.unit.bedrooms}BR / {resident.unit.bathrooms}BA</span>
                       </div>
                       <div>
                         <span className="text-gray-400">Rent:</span>

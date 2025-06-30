@@ -12,7 +12,9 @@ import {
   Edit,
   Home,
   Search,
-  Filter
+  Filter,
+  MoreVertical,
+  Trash2
 } from 'lucide-react';
 import { User, Unit } from '@/types';
 import { demoUnits, demoUsers } from '@/lib/data';
@@ -21,6 +23,8 @@ import { themeClasses } from '@/lib/theme';
 
 export default function AdminUnitsPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
   const router = useRouter();
 
   useEffect(() => {
@@ -41,19 +45,6 @@ export default function AdminUnitsPage() {
     return <div>Loading...</div>;
   }
 
-  const getUnitStatusColor = (status: string) => {
-    switch (status) {
-      case 'occupied':
-        return 'success';
-      case 'vacant':
-        return 'warning';
-      case 'maintenance':
-        return 'error';
-      default:
-        return 'info';
-    }
-  };
-
   const getResidentName = (unitId: string) => {
     const unit = demoUnits.find(u => u.id === unitId);
     if (unit?.residentId) {
@@ -66,19 +57,58 @@ export default function AdminUnitsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'occupied':
-        return 'success';
+        return 'bg-green-900 text-green-300';
       case 'vacant':
-        return 'warning';
+        return 'bg-yellow-900 text-yellow-300';
       case 'maintenance':
-        return 'error';
+        return 'bg-red-900 text-red-300';
       default:
-        return 'info';
+        return 'bg-gray-900 text-gray-300';
     }
   };
+
+  const filteredUnits = demoUnits.filter(unit => {
+    const matchesSearch = unit.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         unit.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         unit.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         unit.zipCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         getResidentName(unit.id).toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filterStatus === 'all' || unit.status === filterStatus;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const stats = [
+    {
+      name: 'Total Units',
+      value: demoUnits.length,
+      icon: Building2,
+    },
+    {
+      name: 'Occupied',
+      value: demoUnits.filter(u => u.status === 'occupied').length,
+      icon: Users,
+      color: 'text-green-400',
+    },
+    {
+      name: 'Vacant',
+      value: demoUnits.filter(u => u.status === 'vacant').length,
+      icon: Home,
+      color: 'text-yellow-400',
+    },
+    {
+      name: 'Maintenance',
+      value: demoUnits.filter(u => u.status === 'maintenance').length,
+      icon: Wrench,
+      color: 'text-red-400',
+    },
+  ];
 
   return (
     <Layout user={user}>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-[#e5e7eb]">Units</h1>
@@ -90,6 +120,27 @@ export default function AdminUnitsPage() {
           </Button>
         </div>
 
+        {/* Stats */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <Card key={stat.name}>
+              <CardContent>
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <stat.icon className={`h-6 w-6 ${stat.color || 'text-blue-400'}`} />
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-400 truncate">{stat.name}</dt>
+                      <dd className="text-lg font-medium text-[#e5e7eb]">{stat.value}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
         {/* Search and Filters */}
         <Card>
           <CardContent>
@@ -99,124 +150,126 @@ export default function AdminUnitsPage() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search units..."
+                    placeholder="Search units by address, city, state, or resident..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 pr-4 py-2 w-full bg-[#22304a] border border-[#22304a] text-[#e5e7eb] placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button variant="secondary" className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  Filter
-                </Button>
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-400" />
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="bg-[#22304a] border border-[#22304a] rounded-lg px-3 py-2 text-[#e5e7eb] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                >
+                  <option value="all">All Status</option>
+                  <option value="occupied">Occupied</option>
+                  <option value="vacant">Vacant</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Units Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {demoUnits.map((unit) => (
-            <Card key={unit.id} className="hover:border-blue-400 transition-colors duration-200">
-              <CardContent>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center">
-                    <Building2 className="h-6 w-6 text-blue-400 mr-3" />
-                    <div>
-                      <h3 className="text-lg font-medium text-[#e5e7eb]">Unit {unit.number}</h3>
-                      <p className="text-sm text-gray-400">{unit.building}</p>
-                    </div>
-                  </div>
-                  <Badge variant={getStatusColor(unit.status)}>
-                    {unit.status}
-                  </Badge>
-                </div>
+        {/* Units Table */}
+        <Card>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-[#22304a]">
+                <thead className="bg-[#181c23]">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Address
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Location
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Rent
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Resident
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-[#181c23] divide-y divide-[#22304a]">
+                  {filteredUnits.map((unit) => (
+                    <tr key={unit.id} className="hover:bg-[#22304a] transition-colors duration-200">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Building2 className="h-5 w-5 text-blue-400 mr-3" />
+                          <div>
+                            <div className="text-sm font-medium text-[#e5e7eb]">
+                              {unit.address}
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              {unit.city}, {unit.state} {unit.zipCode}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#e5e7eb]">
+                        {unit.city}, {unit.state}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#e5e7eb]">
+                        {unit.bedrooms}BR / {unit.bathrooms}BA
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#e5e7eb]">
+                        ${unit.rent}/month
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(unit.status)}`}>
+                          {unit.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#e5e7eb]">
+                        {unit.residentId ? getResidentName(unit.id) : 'No resident'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center space-x-2">
+                          <button className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button className="text-red-400 hover:text-red-300 transition-colors duration-200">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <dt className="text-sm font-medium text-gray-400">Floor</dt>
-                    <dd className="text-sm text-[#e5e7eb]">{unit.floor}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-400">Type</dt>
-                    <dd className="text-sm text-[#e5e7eb]">{unit.bedrooms}BR / {unit.bathrooms}BA</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-400">Rent</dt>
-                    <dd className="text-sm text-[#e5e7eb]">${unit.rent}/month</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-400">Size</dt>
-                    <dd className="text-sm text-[#e5e7eb]">1,200 sq ft</dd>
-                  </div>
-                </div>
-
-                {unit.residentId && (
-                  <div className="border-t border-[#22304a] pt-4">
-                    <dt className="text-sm font-medium text-gray-400 mb-1">Current Resident</dt>
-                    <dd className="text-sm text-[#e5e7eb]">{getResidentName(unit.id)}</dd>
-                  </div>
-                )}
-
-                <div className="flex gap-2 mt-4">
-                  <Button variant="secondary" size="sm" className="flex-1">
-                    View Details
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    Edit
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <Card>
-            <CardContent>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#e5e7eb]">
-                  {demoUnits.length}
-                </div>
-                <div className="text-sm text-gray-400">Total Units</div>
+            {filteredUnits.length === 0 && (
+              <div className="text-center py-8">
+                <Building2 className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-400">No units found</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  {searchTerm || filterStatus !== 'all' 
+                    ? 'Try adjusting your search or filter criteria.'
+                    : 'Get started by adding your first unit.'
+                  }
+                </p>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-400">
-                  {demoUnits.filter(u => u.status === 'occupied').length}
-                </div>
-                <div className="text-sm text-gray-400">Occupied</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400">
-                  {demoUnits.filter(u => u.status === 'vacant').length}
-                </div>
-                <div className="text-sm text-gray-400">Vacant</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-400">
-                  {demoUnits.filter(u => u.status === 'maintenance').length}
-                </div>
-                <div className="text-sm text-gray-400">Maintenance</div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

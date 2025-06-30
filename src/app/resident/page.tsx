@@ -122,14 +122,14 @@ export default function ResidentDashboard() {
               <div className="flex items-center">
                 <Home className="h-8 w-8 text-blue-400" />
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-[#e5e7eb]">Your Unit</h3>
-                  <p className="text-sm text-gray-400">Unit {userUnit.number} • {userUnit.building}</p>
+                  <h3 className="text-lg font-medium text-[#e5e7eb]">Your Property</h3>
+                  <p className="text-sm text-gray-400">{userUnit.address} • {userUnit.city}, {userUnit.state}</p>
                 </div>
               </div>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div>
-                  <dt className="text-sm font-medium text-gray-400">Floor</dt>
-                  <dd className="mt-1 text-lg font-semibold text-[#e5e7eb]">{userUnit.floor}</dd>
+                  <dt className="text-sm font-medium text-gray-400">Address</dt>
+                  <dd className="mt-1 text-lg font-semibold text-[#e5e7eb]">{userUnit.address}</dd>
                 </div>
                 <div>
                   <dt className="text-sm font-medium text-gray-400">Bedrooms</dt>
